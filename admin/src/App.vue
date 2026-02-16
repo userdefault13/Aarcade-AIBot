@@ -141,7 +141,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 
-const baseUrl = import.meta.env.VITE_AI_BOT_URL || '';
+const baseUrl = (import.meta.env.VITE_AI_BOT_URL || '').replace(/\/$/, '');
 
 const health = ref(null);
 const healthLoading = ref(false);
@@ -183,7 +183,12 @@ async function fetchHealth() {
   try {
     const res = await fetch(`${baseUrl}/api/health`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    health.value = await res.json();
+    const text = await res.text();
+    try {
+      health.value = JSON.parse(text);
+    } catch {
+      throw new Error('API returned HTML instead of JSON. Redeploy the admin app after setting VITE_AI_BOT_URL.');
+    }
   } catch (err) {
     healthError.value = err?.message || 'Failed to fetch health';
     health.value = null;
@@ -202,7 +207,12 @@ async function fetchTools() {
   try {
     const res = await fetch(`${baseUrl}/api/tools`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    tools.value = await res.json();
+    const text = await res.text();
+    try {
+      tools.value = JSON.parse(text);
+    } catch {
+      throw new Error('API returned HTML instead of JSON. Redeploy the admin app after setting VITE_AI_BOT_URL.');
+    }
   } catch (err) {
     toolsError.value = err?.message || 'Failed to fetch tools';
     tools.value = null;

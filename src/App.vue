@@ -41,40 +41,6 @@
               </button>
             </div>
           </div>
-      </div>
-    </header>
-
-    <main :class="$style.main">
-      <div ref="messagesContainer" :class="$style.messages">
-        <!-- Welcome message (shown when empty) -->
-        <div v-if="messages.length === 0" :class="$style.welcome">
-            <div v-if="msg.role === 'assistant'" :class="$style.msgAvatar">
-              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
-            </div>
-            <div
-              :class="[
-                $style.bubble,
-                msg.role === 'user' ? $style.bubbleUser : $style.bubbleAssistant
-              ]"
-            >
-              <p v-if="msg.content === '...'" :class="$style.typing">
-                <span></span><span></span><span></span>
-              </p>
-              <p v-else :class="$style.bubbleContent" v-html="formatReply(msg.content)"></p>
-            <p :class="$style.welcomeHint">Try a question below or type your own:</p>
-            <div :class="$style.chips">
-              <button
-                v-for="q in quickReplies"
-                :key="q"
-                :class="$style.chip"
-                @click="sendQuickReply(q)"
-              >
-                {{ q }}
-              </button>
-            </div>
-          </div>
         </div>
         <div v-else :class="$style.messageList">
           <div
@@ -105,20 +71,6 @@
             @keydown="handleKeydown"
           />
           <button
-const quickReplies = [
-  'What is a gotchi?',
-  'What is DCA?',
-  'dca 100 12 50000',
-  'btc 30',
-  'What is RSI?',
-  'List all topics',
-];
-
-function sendQuickReply(q) {
-  messageInput.value = q;
-  sendMessage();
-}
-
             :class="$style.sendBtn"
             :disabled="!messageInput.trim() || sending"
             @click="sendMessage"
@@ -182,6 +134,36 @@ async function sendMessage() {
 
     const last = messages.value[messages.value.length - 1];
     if (last?.role === 'assistant') last.content = reply;
+  } catch (err) {
+    const last = messages.value[messages.value.length - 1];
+    if (last?.role === 'assistant') last.content = `Error: ${err.message}`;
+  } finally {
+    sending.value = false;
+    nextTick(() => scrollToBottom());
+  }
+}
+
+const quickReplies = [
+  'What is a gotchi?',
+  'What is DCA?',
+  'dca 100 12 50000',
+  'btc 30',
+  'What is RSI?',
+  'List all topics',
+];
+
+function sendQuickReply(q) {
+  messageInput.value = q;
+  sendMessage();
+}
+
+function scrollToBottom() {
+  messagesContainer.value?.scrollTo?.({ top: messagesContainer.value.scrollHeight, behavior: 'smooth' });
+}
+</script>
+
+<style module>
+.header {
   padding: 1rem 1.25rem;
   border-bottom: 2px solid rgba(139, 87, 255, 0.4);
 }
@@ -221,8 +203,8 @@ async function sendMessage() {
 .subtitle {
   font-size: 0.8rem;
   color: rgba(255, 255, 255, 0.7);
+}
 
-<style module>
 .app {
   min-height: 100vh;
   background: linear-gradient(180deg, #1a0a2e 0%, #2E1E5C 50%, #1a0a2e 100%);
@@ -231,18 +213,6 @@ async function sendMessage() {
   flex-direction: column;
 }
 
-.header {
-  padding: 2rem 1.5rem;
-  border-bottom: 2px solid rgba(139, 87, 255, 0.4);
-  text-align: center;
-}
-
-.title {
-  font-family: 'Press Start 2P', monospace;
-  font-size: 0.9rem;
-  margin: 0 0 0.5rem 0;
-  color: #A78BFA;
-}
 .welcome {
   display: flex;
   flex-direction: column;
@@ -344,25 +314,6 @@ async function sendMessage() {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-}
-  align-items: flex-end;
-  gap: 0.5rem;
-}
-
-.messageLeft {
-  justify-content: flex-start;
-}
-
-.messageRight {
-  justify-content: flex-end;
-}
-
-}
-
-.emptyHint {
-  font-size: 0.8rem;
-  margin-top: 1rem;
-  color: rgba(255, 255, 255, 0.5);
 }
 
 .messageList {

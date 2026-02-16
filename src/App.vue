@@ -24,6 +24,10 @@
               <li><strong>Aavegotchi</strong> – gotchis, GHST, Baazaar, staking</li>
               <li><strong>Aarcade games</strong> – Paarcel, Gotchinopoly</li>
               <li><strong>Business</strong> – departments, roadmap, Journey Builder</li>
+              <li><strong>Stats</strong> – <code>mean of 1, 2, 3</code>, <code>std 10 20 30</code></li>
+              <li><strong>Calculus</strong> – <code>derivative of x^2</code>, <code>integral of x^2 from 0 to 1</code></li>
+              <li><strong>Writing</strong> – <code>summarize:</code> or <code>rewrite:</code> + text</li>
+              <li><strong>Search</strong> – <code>search: your query</code> (if enabled)</li>
             </ul>
             <p :class="$style.welcomeHint">Try a question below or type your own:</p>
             <div :class="$style.chips">
@@ -104,7 +108,8 @@ const messagesContainer = ref(null);
 const quickReplies = [
   'What is a gotchi?',
   'How do I play Paarcel?',
-  'Gotchinopoly roadmap',
+  'mean of 1, 2, 3, 4, 5',
+  'derivative of x^2',
   'List all topics',
 ];
 
@@ -252,6 +257,12 @@ function scrollToBottom() {
 
 .welcomeList li {
   margin-bottom: 0.25rem;
+}
+.welcomeList code {
+  background: rgba(109, 24, 248, 0.3);
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  font-size: 0.85em;
 }
 
 .welcomeHint {

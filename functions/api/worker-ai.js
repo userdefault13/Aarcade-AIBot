@@ -32,12 +32,23 @@ export async function onRequest(context) {
   }
 
   if (request.method === 'POST') {
+    let customTools = [];
+    try {
+      const origin = new URL(request.url).origin;
+      const res = await fetch(`${origin}/custom-tools.json`);
+      if (res.ok) {
+        const data = await res.json();
+        customTools = Array.isArray(data) ? data : [];
+      }
+    } catch (_) {}
+
     let body = {};
     try {
       body = await request.json();
     } catch (_) {}
     const query = (body.query || '').trim();
     let reply;
+    const getReplyOpts = { customTools };
 
     // Summarize: "summarize:" or "summarize this:" followed by text
     const summarizeMatch = query.match(/^summarize(?:\s+this)?[:\s]+(.+)/is);
@@ -49,9 +60,9 @@ export async function onRequest(context) {
             prompt: `Summarize the following in 2-4 concise sentences. Keep the key points:\n\n${text.slice(0, 4000)}`,
             max_tokens: 256,
           });
-          reply = (aiRes?.response ?? aiRes?.result?.response ?? '')?.trim() || getReply(query);
+          reply = (aiRes?.response ?? aiRes?.result?.response ?? '')?.trim() || getReply(query, getReplyOpts);
         } catch (err) {
-          reply = getReply(query);
+          reply = getReply(query, getReplyOpts);
         }
       } else {
         reply = 'Please provide more text to summarize (e.g. "summarize: [your text here]").';
@@ -74,9 +85,9 @@ export async function onRequest(context) {
             prompt: `${prompts[action] || prompts.rewrite}\n\n${text.slice(0, 4000)}`,
             max_tokens: 512,
           });
-          reply = (aiRes?.response ?? aiRes?.result?.response ?? '')?.trim() || getReply(query);
+          reply = (aiRes?.response ?? aiRes?.result?.response ?? '')?.trim() || getReply(query, getReplyOpts);
         } catch (err) {
-          reply = getReply(query);
+          reply = getReply(query, getReplyOpts);
         }
       } else {
         reply = `Please provide text after "${action}:" (e.g. "${action}: [your text]").`;
@@ -107,7 +118,7 @@ export async function onRequest(context) {
             reply = `No results found for "${searchQuery}".`;
           }
         } catch (err) {
-          reply = getReply(query);
+          reply = getReply(query, getReplyOpts);
         }
       } else {
         reply = 'Usage: "search: [your query]" or "search for: [query]"';
@@ -200,7 +211,7 @@ export async function onRequest(context) {
       }
     }
     else {
-      reply = getReply(query);
+      reply = getReply(query, getReplyOpts);
     }
 
     return json({ reply });

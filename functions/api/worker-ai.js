@@ -1,8 +1,8 @@
 /**
- * Cloudflare Pages Function: Department WorkerAI API.
+ * Cloudflare Pages Function: Aarcade Assistant API.
  * POST /api/worker-ai with body: { query: string }
  */
-import { DEPARTMENTS, getReply } from '../../lib/worker-ai.js';
+import { ALL_TOPICS, getReply } from '../../lib/worker-ai.js';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -26,8 +26,8 @@ export async function onRequest(context) {
 
   if (request.method === 'GET') {
     return json({
-      departments: DEPARTMENTS.map((d) => ({ id: d.id, title: d.title, path: d.path })),
-      message: 'POST { query: string } to ask questions about departments.',
+      topics: ALL_TOPICS.map((t) => ({ id: t.id, title: t.title, path: t.path, category: t.category })),
+      message: 'POST { query: string } to ask about Aavegotchi, Aarcade games, or Business.',
     });
   }
 

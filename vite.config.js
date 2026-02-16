@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import path from 'path';
-import { getReply, DEPARTMENTS } from './lib/worker-ai.js';
+import { getReply, ALL_TOPICS } from './lib/worker-ai.js';
 
 function workerAiDevPlugin() {
   return {
@@ -20,8 +20,8 @@ function workerAiDevPlugin() {
           if (req.method === 'GET') {
             res.setHeader('Content-Type', 'application/json');
             res.end(JSON.stringify({
-              departments: DEPARTMENTS.map((d) => ({ id: d.id, title: d.title, path: d.path })),
-              message: 'POST { query: string } to ask questions about departments.',
+              topics: ALL_TOPICS.map((t) => ({ id: t.id, title: t.title, path: t.path, category: t.category })),
+              message: 'POST { query: string } to ask about Aavegotchi, Aarcade games, or Business.',
             }));
             return;
           }

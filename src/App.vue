@@ -1,16 +1,16 @@
 <template>
   <div :class="$style.app">
     <header :class="$style.header">
-      <h1 :class="$style.title">Department Assistant</h1>
-      <p :class="$style.subtitle">Ask about the 8 Business Development departments</p>
+      <h1 :class="$style.title">Aarcade Assistant</h1>
+      <p :class="$style.subtitle">Ask about Aavegotchi, Aarcade games, or Business</p>
     </header>
 
     <main :class="$style.main">
       <div ref="messagesContainer" :class="$style.messages">
         <div v-if="messages.length === 0" :class="$style.empty">
-          <p>Ask about any of the 8 departments:</p>
-          <p :class="$style.emptySub">Executive, HR, Finance, Marketing, Sales, Operations, Communications, IT</p>
-          <p :class="$style.emptyHint">e.g. "List all departments" or "What does IT do?"</p>
+          <p>Ask about Aavegotchi, Aarcade Gh$t, or Business:</p>
+          <p :class="$style.emptySub">Gotchis, GHST, Baazaar, Paarcel, Gotchinopoly, Leaderboard, Departments...</p>
+          <p :class="$style.emptyHint">e.g. "What is a gotchi?" or "How do I play?" or "List all topics"</p>
         </div>
         <div v-else :class="$style.messageList">
           <div
@@ -35,7 +35,7 @@
           <input
             v-model="messageInput"
             type="text"
-            placeholder="Ask about departments..."
+            placeholder="Ask about Aavegotchi, games, or business..."
             :class="$style.input"
             :disabled="sending"
             @keydown="handleKeydown"

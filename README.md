@@ -1,6 +1,9 @@
 # Aarcade AI Bot
 
-Standalone Department Assistant chatbot for Cloudflare Pages. Answers queries about the 8 Business Development departments (Executive, HR, Finance, Marketing, Sales, Operations, Communications, IT).
+Standalone **Aarcade Assistant** for Cloudflare Pages. Answers questions about:
+- **Aavegotchi** – gotchis, GHST, Baazaar, staking, wearables, DAO, etc.
+- **Aarcade Gh$t** – games (Paarcel, Gotchinopoly), leaderboard, player profile, manuals
+- **Business** – 8 departments (Executive, HR, Finance, Marketing, Sales, Operations, Communications, IT)
 
 ## Development
 
@@ -40,7 +43,7 @@ To embed this chatbot in another site (e.g. AarcadeGh-t), add an iframe:
 ```html
 <iframe
   src="https://aarcade-aibot.pages.dev"
-  title="Department Assistant"
+  title="Aarcade Assistant"
   width="400"
   height="600"
   style="border: none; border-radius: 12px;"

@@ -1,16 +1,42 @@
 <template>
   <div :class="$style.app">
     <header :class="$style.header">
-      <h1 :class="$style.title">Aarcade Assistant</h1>
-      <p :class="$style.subtitle">Ask about Aavegotchi, Aarcade games, or Business</p>
+      <div :class="$style.headerInner">
+        <div :class="$style.avatar">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+          </svg>
+        </div>
+        <div>
+          <h1 :class="$style.title">Aarcade Assistant</h1>
+          <p :class="$style.subtitle">Hi! Ask me anything about Aavegotchi, games, or business.</p>
+        </div>
+      </div>
     </header>
 
     <main :class="$style.main">
       <div ref="messagesContainer" :class="$style.messages">
-        <div v-if="messages.length === 0" :class="$style.empty">
-          <p>Ask about Aavegotchi, Aarcade Gh$t, or Business:</p>
-          <p :class="$style.emptySub">Gotchis, GHST, Baazaar, Paarcel, Gotchinopoly, Leaderboard, Departments...</p>
-          <p :class="$style.emptyHint">e.g. "What is a gotchi?" or "How do I play?" or "List all topics"</p>
+        <!-- Welcome message (shown when empty) -->
+        <div v-if="messages.length === 0" :class="$style.welcome">
+          <div :class="[$style.bubble, $style.bubbleAssistant]">
+            <p :class="$style.bubbleContent">Hi! I'm the Aarcade Assistant. I can help with:</p>
+            <ul :class="$style.welcomeList">
+              <li><strong>Aavegotchi</strong> – gotchis, GHST, Baazaar, staking</li>
+              <li><strong>Aarcade games</strong> – Paarcel, Gotchinopoly</li>
+              <li><strong>Business</strong> – departments, roadmap, Journey Builder</li>
+            </ul>
+            <p :class="$style.welcomeHint">Try a question below or type your own:</p>
+            <div :class="$style.chips">
+              <button
+                v-for="q in quickReplies"
+                :key="q"
+                :class="$style.chip"
+                @click="sendQuickReply(q)"
+              >
+                {{ q }}
+              </button>
+            </div>
+          </div>
         </div>
         <div v-else :class="$style.messageList">
           <div
@@ -18,13 +44,21 @@
             :key="i"
             :class="[$style.messageRow, msg.role === 'user' ? $style.messageRight : $style.messageLeft]"
           >
+            <div v-if="msg.role === 'assistant'" :class="$style.msgAvatar">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+              </svg>
+            </div>
             <div
               :class="[
                 $style.bubble,
                 msg.role === 'user' ? $style.bubbleUser : $style.bubbleAssistant
               ]"
             >
-              <p :class="$style.bubbleContent" v-html="formatReply(msg.content)"></p>
+              <p v-if="msg.content === '...'" :class="$style.typing">
+                <span></span><span></span><span></span>
+              </p>
+              <p v-else :class="$style.bubbleContent" v-html="formatReply(msg.content)"></p>
             </div>
           </div>
         </div>
@@ -66,6 +100,18 @@ const messages = ref([]);
 const messageInput = ref('');
 const sending = ref(false);
 const messagesContainer = ref(null);
+
+const quickReplies = [
+  'What is a gotchi?',
+  'How do I play Paarcel?',
+  'Gotchinopoly roadmap',
+  'List all topics',
+];
+
+function sendQuickReply(q) {
+  messageInput.value = q;
+  sendMessage();
+}
 
 function formatReply(text) {
   if (!text) return '';
@@ -130,21 +176,45 @@ function scrollToBottom() {
 }
 
 .header {
-  padding: 2rem 1.5rem;
+  padding: 1rem 1.25rem;
   border-bottom: 2px solid rgba(139, 87, 255, 0.4);
-  text-align: center;
+}
+
+.headerInner {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 42rem;
+  margin: 0 auto;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(139, 87, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.avatar svg {
+  width: 22px;
+  height: 22px;
+  color: #A78BFA;
 }
 
 .title {
   font-family: 'Press Start 2P', monospace;
-  font-size: 0.9rem;
-  margin: 0 0 0.5rem 0;
+  font-size: 0.65rem;
+  margin: 0 0 0.25rem 0;
   color: #A78BFA;
 }
 
 .subtitle {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
   margin: 0;
 }
 
@@ -167,21 +237,92 @@ function scrollToBottom() {
   gap: 1rem;
 }
 
-.empty {
-  text-align: center;
-  color: rgba(255, 255, 255, 0.6);
-  padding: 3rem 2rem;
+.welcome {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
 }
 
-.emptySub {
-  font-size: 0.95rem;
+.welcomeList {
+  margin: 0.5rem 0;
+  padding-left: 1.25rem;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.welcomeList li {
+  margin-bottom: 0.25rem;
+}
+
+.welcomeHint {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0.75rem 0 0.5rem 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin-top: 0.5rem;
 }
 
-.emptyHint {
+.chip {
+  padding: 0.5rem 0.9rem;
+  background: rgba(109, 24, 248, 0.4);
+  border: 1px solid rgba(139, 87, 255, 0.6);
+  border-radius: 20px;
+  color: white;
   font-size: 0.8rem;
-  margin-top: 1rem;
-  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.chip:hover {
+  background: rgba(109, 24, 248, 0.6);
+  border-color: rgba(139, 87, 255, 0.9);
+}
+
+.msgAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(139, 87, 255, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  align-self: flex-end;
+}
+
+.msgAvatar svg {
+  width: 14px;
+  height: 14px;
+  color: #A78BFA;
+}
+
+.typing {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0.25rem 0;
+}
+
+.typing span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+  animation: bounce 1.4s ease-in-out infinite both;
+}
+
+.typing span:nth-child(1) { animation-delay: 0s; }
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes bounce {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
+  40% { transform: scale(1); opacity: 1; }
 }
 
 .messageList {
@@ -192,6 +333,8 @@ function scrollToBottom() {
 
 .messageRow {
   display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
 }
 
 .messageLeft {

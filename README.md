@@ -6,6 +6,10 @@ Standalone **Aarcade Assistant** for Cloudflare Pages. Answers questions about:
 - **Business** – 8 departments (Executive, HR, Finance, Marketing, Sales, Operations, Communications, IT)
 - **Writing** – `summarize: [text]` or `rewrite: [text]` (uses Cloudflare Workers AI)
 - **Web search** – `search: [query]` (optional, requires Serper API key)
+- **Historical data** – CPI, BTC/ETH prices, stock tickers (see below)
+- **Crypto & trading** – DCA, HODL, RSI, moving averages, stop loss, take profit
+- **Writing** – `summarize: [text]` or `rewrite: [text]` (uses Cloudflare Workers AI)
+- **Web search** – `search: [query]` (optional, requires Serper API key)
 
 ## Development
 
@@ -29,11 +33,16 @@ Or with Wrangler directly:
 npx wrangler pages deploy dist --project-name=aarcade-aibot
 ```
 
-**First-time setup:** Create a Pages project in the [Cloudflare dashboard](https://dash.cloudflare.com/) (Workers & Pages → Create → Pages → Connect to Git, or Direct Upload). For Direct Upload, run `wrangler pages deploy dist` and follow the prompts to create the project.
-
 **Workers AI** (summarize/rewrite): Add the AI binding in the dashboard (Settings → Bindings → Workers AI). The wrangler.toml already includes `[ai] binding = "AI"`.
 
 **Web search** (optional): Add `SERPER_API_KEY` as an environment variable/secret in the dashboard. Get a key at [serper.dev](https://serper.dev). Then use `search: your query` in the chat.
+
+**Historical data** (optional):
+- **CPI / inflation:** `cpi` or `cpi 12` — add `FRED_API_KEY` (free at [FRED](https://fred.stlouisfed.org/docs/api/api_key.html))
+- **Bitcoin / Ethereum:** `btc`, `btc 30`, `eth 7` — no key needed (CoinGecko)
+- **Stocks:** `stock: AAPL`, `ticker: MSFT` — add `ALPHAVANTAGE_API_KEY` (free 25 req/day at [Alpha Vantage](https://www.alphavantage.co/support/#api-key))
+
+**First-time setup:** Create a Pages project in the [Cloudflare dashboard](https://dash.cloudflare.com/) (Workers & Pages → Create → Pages → Connect to Git, or Direct Upload). For Direct Upload, run `wrangler pages deploy dist` and follow the prompts to create the project.
 
 ## Project structure
 

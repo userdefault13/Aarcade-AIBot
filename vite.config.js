@@ -39,6 +39,13 @@ function workerAiDevPlugin() {
                 } else {
                   reply = getReply(query);
                 }
+                if (/^summarize(?:\s+this)?[:\s]+/i.test(query) || /^(rewrite|improve|write|rephrase)(?:\s+this)?[:\s]+/i.test(query)) {
+                  reply = 'Summarize/rewrite uses Cloudflare Workers AI and works when deployed. Run `npm run pages:deploy` and test on the live site.';
+                } else if (/^search(?:\s+for)?[:\s]+/i.test(query)) {
+                  reply = 'Web search requires SERPER_API_KEY when deployed. Add it in Cloudflare dashboard → Settings → Environment variables.';
+                } else {
+                  reply = getReply(query);
+                }
                 res.setHeader('Content-Type', 'application/json');
                 res.end(JSON.stringify({ reply }));
               } catch (_) {

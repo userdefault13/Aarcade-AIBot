@@ -10,6 +10,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
+const AI_MODEL = '@cf/meta/llama-3.1-70b-instruct';
+
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
@@ -56,7 +58,7 @@ export async function onRequest(context) {
       const text = summarizeMatch[1].trim();
       if (text.length > 50) {
         try {
-          const aiRes = await context.env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+          const aiRes = await context.env.AI.run(AI_MODEL, {
             prompt: `Summarize the following in 2-4 concise sentences. Keep the key points:\n\n${text.slice(0, 4000)}`,
             max_tokens: 256,
           });
@@ -81,7 +83,7 @@ export async function onRequest(context) {
       };
       if (text.length > 20) {
         try {
-          const aiRes = await context.env.AI.run('@cf/meta/llama-3.1-8b-instruct', {
+          const aiRes = await context.env.AI.run(AI_MODEL, {
             prompt: `${prompts[action] || prompts.rewrite}\n\n${text.slice(0, 4000)}`,
             max_tokens: 512,
           });
@@ -212,6 +214,42 @@ export async function onRequest(context) {
     }
     else {
       reply = getReply(query, getReplyOpts);
+      // Web search + AI for unknown queries (Option 3: autonomous answers)
+      const fallbackPrefix = 'I couldn\'t find a specific match.';
+      if (reply.startsWith(fallbackPrefix) && context.env.SERPER_API_KEY && context.env.AI) {
+        try {
+          const searchRes = await fetch('https://google.serper.dev/search', {
+            method: 'POST',
+            headers: {
+              'X-API-KEY': context.env.SERPER_API_KEY,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ q: query, num: 5 }),
+          });
+          const searchData = await searchRes.json();
+          const results = searchData.organic || [];
+          if (results.length > 0) {
+            const contextText = results
+              .slice(0, 5)
+              .map((r) => `**${r.title || 'Result'}**: ${r.snippet || ''} (${r.link || ''})`)
+              .join('\n\n');
+            const aiRes = await context.env.AI.run(AI_MODEL, {
+              prompt: `You are the Aarcade Assistant. The user asked: "${query}"
+
+Here are relevant web search results:
+
+${contextText}
+
+Use these to answer the user's question concisely and accurately. If the results don't cover the question well, say so briefly. Keep the response focused and helpful (2-5 sentences). Format with markdown when appropriate.`,
+              max_tokens: 512,
+            });
+            const aiReply = (aiRes?.response ?? aiRes?.result?.response ?? '')?.trim();
+            if (aiReply) reply = aiReply;
+          }
+        } catch (_) {
+          // Keep original fallback on error
+        }
+      }
     }
 
     return json({ reply });
